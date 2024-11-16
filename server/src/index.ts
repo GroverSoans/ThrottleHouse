@@ -37,4 +37,4 @@ app.listen(PORT, async()=> {
     console.log(`Server is running on port ${PORT} in ${NODE_ENV} enviornment`);
     await connectToDatabase();
 });
-
+//1:25:24

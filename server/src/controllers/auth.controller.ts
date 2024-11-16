@@ -1,20 +1,11 @@
 import { z } from "zod";
 import catchErrors from "../utils/catchErrors";
-import { createAccount } from "../service/auth.service";
-import { CREATED } from "../constants/http";
+import { createAccount, loginUser } from "../service/auth.service";
+import { CREATED, OK } from "../constants/http";
 import { setAuthCookies } from "../utils/cookies";
+import { loginSchema, registerSchema } from "./auth.schemas";
 
-const registerSchema = z.object({
-    email: z.string().email().min(1).max(255),
-    password: z.string().min(6).max(255),
-    confirmPassword: z.string().min(6).max(255),
-    userAgent: z.string().optional(),
-}).refine(
-    (data) => data.password === data.confirmPassword, {
-        message: "Passwords do not match",
-        path: ["confirmPassword"],
-    }
-)
+
 
 
 export const registerHandler = catchErrors(async(req, res) => {
@@ -34,3 +25,20 @@ export const registerHandler = catchErrors(async(req, res) => {
     .status(CREATED)
     .json(user)
 })
+
+export const loginHandler = catchErrors(async (req, res) => {
+    const request = loginSchema.parse({
+        ...req.body,
+        userAgent: req.headers["user-agent"],
+    });
+
+    const {
+        accessToken,
+        refreshToken,
+        user
+    } = await loginUser(request);
+
+    return setAuthCookies({res, accessToken, refreshToken}).status(OK).json({
+        message: "Login Successful"
+    });
+});
