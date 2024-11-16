@@ -1,9 +1,9 @@
 import { z } from "zod";
 import catchErrors from "../utils/catchErrors";
-import { createAccount, loginUser, refreshUserAccessToken, verifyEmail } from "../service/auth.service";
+import { createAccount, loginUser, refreshUserAccessToken, resetPassword, sendPasswordResetEmail, verifyEmail } from "../service/auth.service";
 import { CREATED, OK, UNAUTHORIZED } from "../constants/http";
 import { clearAuthCookies, getAccessTokenCookieOptions, getRefreshTokenCookieOptions, setAuthCookies } from "../utils/cookies";
-import { loginSchema, registerSchema, verificationCodeSchema } from "./auth.schemas";
+import { emailSchema, loginSchema, registerSchema, resetPasswordSchema, verificationCodeSchema } from "./auth.schemas";
 import { verifyToken } from "../utils/jwt";
 import SessionModel from "../models/session.model";
 import appAssert from "../utils/appAssert";
@@ -86,3 +86,20 @@ export const verifyEmailHandler = catchErrors(async (req, res) => {
     return res.status(OK).json({ message: "Email was successfully verified" });
 });
 
+export const sendPasswordResetHandler = catchErrors(async (req, res)=> {
+    const email = emailSchema.parse(req.body.email);
+
+    await sendPasswordResetEmail(email);
+
+    return res.status(OK).json({ message: "Password reset email sent"});
+})
+
+export const resetPasswordHandler = catchErrors(async (req, res) => {
+    const request = resetPasswordSchema.parse(req.body);
+  
+    await resetPassword(request);
+  
+    return clearAuthCookies(res)
+      .status(OK)
+      .json({ message: "Password was reset successfully" });
+});
