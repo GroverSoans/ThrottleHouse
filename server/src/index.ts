@@ -8,6 +8,8 @@ import errorHandler from "./middleware/errorHandler";
 import catchErrors from "./utils/catchErrors";
 import { OK } from "./constants/http";
 import authRoutes from "./routes/auth.routes";
+import authenticate from "./middleware/authenticate";
+import userRoutes from "./routes/user.routes";
 
 const app = express();
 
@@ -31,10 +33,13 @@ app.get("/",(req, res, next) => {
 
 app.use("/auth", authRoutes)
 
+//protected routes
+app.use("/user", authenticate, userRoutes)
+
 app.use(errorHandler)
 
 app.listen(PORT, async()=> {
     console.log(`Server is running on port ${PORT} in ${NODE_ENV} enviornment`);
     await connectToDatabase();
 });
-//1:25:24
+
