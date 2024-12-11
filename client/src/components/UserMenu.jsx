@@ -1,4 +1,4 @@
-import { Avatar, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
+import { Avatar, Menu, MenuButton,  MenuItem, MenuList } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../lib/api";
